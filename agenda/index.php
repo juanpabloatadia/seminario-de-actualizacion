@@ -17,21 +17,33 @@ header('Content-Type:text/html;charset=UTF-8');
 </header>
 <nav>
 <form action='' method='post'>
+<label>Buscar por:</label>
+<select name="campo">
+<option value="nombre">Nombre</option>
+<option value="apellido">Apellido</option>
+<option value="telefono">Teléfono</option>
+<option value="direccion">Dirección</option>
+</select>
+<input type="text" name="busqueda" placeholder="Escribe aquí"/>
+<input type="submit" name="buscar" value="Buscar"/>
+</form>
+
+<form action='' method='post'>
 <label>Selecciona en qué orden quieres ver los contactos:</label>
-<br><select name="orden">
+<select name="orden">
 <option value="id" selected>Selecciona una opción</option>
 <option value="nombre">Nombre</option>
 <option value="apellido">Apellido</option>
 <option value="telefono">Telefono</option>
 <option value="direccion">Direccion</option>
-</select><br>
-<input type="submit" name="ordenar" value="Ordenar"/><br>
+</select>
+<input type="submit" name="ordenar" value="Ordenar"/>
 </form>
 </nav>
 <section id="section">
 <article>
 <div class="header">
-<h1>AGENDA DE CONTACTOS:</h1>
+<h1>LISTA DE CONTACTOS:</h1>
 </div>
 <hr><br>
 <div class="content">
@@ -41,22 +53,45 @@ header('Content-Type:text/html;charset=UTF-8');
 </tr>
 
 <?php
-if(isset($_POST['ordenar']))
+if(isset($_POST['buscar']))
 {
-	$orden=$_POST['orden'];
+    $campo = $_POST['campo'];
+    $busqueda = $_POST['busqueda'];
+    require('include/config.php');
+
+    try
+    {
+        $sql=$db->prepare("SELECT id, nombre, apellido, telefono, direccion FROM contactos WHERE $campo LIKE '%$busqueda%'");
+        $sql->execute();
+        
+        while($row=$sql->fetch())
+        {
+            echo "<tr><td>".$row['nombre']."</td><td>".$row['apellido']."</td><td>".$row['telefono']."</td><td>".$row['direccion']."</td><td><button><a href='contacto.php?id=".$row['id']."'>Mostrar</a></button></td></tr>";
+        }
+	}
+    
+	catch(PDOException $e)
+	{
+		echo $e->getMessage();
+	}
+}
+
+elseif(isset($_POST['ordenar']))
+{
+	$orden = $_POST['orden'];
 	require('include/config.php');
 
 	try
 	{
-		$sql=$db->prepare('SELECT id,nombre,apellido,telefono,direccion FROM contactos ORDER BY '.$orden);
+		$sql=$db->prepare("SELECT id, nombre, apellido, telefono, direccion FROM contactos ORDER BY $orden");
 		$sql->execute();
-	
+       
 		while($row=$sql->fetch())
 		{
 			echo "<tr><td>".$row['nombre']."</td><td>".$row['apellido']."</td><td>".$row['telefono']."</td><td>".$row['direccion']."</td><td><button><a href='contacto.php?id=".$row['id']."'>Mostrar</a></button></td></tr>";
 		}
 	}
-
+    
 	catch(PDOException $e)
 	{
 		echo $e->getMessage();
@@ -64,7 +99,8 @@ if(isset($_POST['ordenar']))
 }
 ?>
 
-</table><br>
+</table>
+<br>
 <form action='' method='post'>
 <input type="submit" name="crear" value="Nuevo contacto"/>
 </form>
@@ -72,7 +108,7 @@ if(isset($_POST['ordenar']))
 <?php
 if(isset($_POST['crear']))
 {
-	header("location:nuevo.php");
+    header("location:nuevo.php");
 }
 ?>
 
