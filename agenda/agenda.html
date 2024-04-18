@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Contactos</title>    
+</head>
+<body>
+    <header id="header">        
+    </header>
+    <nav>
+        <ul>
+            <li><a href="index.php">Inicio</a></li>
+            <li><a href="nuevo.php">Nuevo Contacto</a></li>
+        </ul>
+    </nav>
+    <section id="section">
+        <article>
+            <h1>Agenda de Contactos</h1>
+            <form action="lista_contactos.php" method="post">
+                <label for="orden">Selecciona en qué orden quieres ver los contactos:</label><br>
+                <select name="orden" id="orden">
+                    <option value="id">Selecciona una opción</option>
+                    <option value="nombre">Nombre</option>
+                    <option value="apellido">Apellido</option>
+                    <option value="telefono">Teléfono</option>
+                    <option value="direccion">Dirección</option>
+                </select>
+                <input type="submit" name="ordenar" value="Ordenar">
+            </form>
+            <!-- Aquí se mostrará la lista de contactos -->
+            <div id="lista_contactos">
+                <!-- El contenido de la lista de contactos se cargará dinámicamente a través de AJAX -->
+            </div>
+        </article>
+    </section>
+    <footer id="footer">
+        
+    </footer>
+</body>
+</html>
