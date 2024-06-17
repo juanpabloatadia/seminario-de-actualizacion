@@ -1,0 +1,3 @@
+{
+    "session_method": "token"  // Puede ser "session" o "token"
+}
