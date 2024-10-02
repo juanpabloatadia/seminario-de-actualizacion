@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sala Chat Boca Juniors</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0034A7; /* Azul de Boca */
+            color: #FFD700; /* Amarillo dorado */
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px #000000;
+        }
+        #chat_area {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        input {
+            background-color: #FFD700;
+            color: #0034A7;
+        }
+        button {
+            background-color: #FFD700;
+            color: #0034A7;
+            cursor: pointer;
+            font-weight: bold;
+            width: auto; /* Cambiado de 100% a auto */
+            padding: 8px 15px; /* Reducido el padding */
+            font-size: 14px; /* Tamaño de fuente más pequeño */
+        }
+        button:hover {
+            background-color: #FFC300;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sala Chat Dale Bocaaaa!!!</h1>
+    <div id="chat_area">
+        <input id="username_input" placeholder="Tu nombre de usuario" autocomplete="off">
+        <button id="join_button">Unirse al chat</button>
+        <div id="messages"></div>
+        <input id="message_input" placeholder="Escribe un mensaje" autocomplete="off" style="display: none;">
+        <button id="send_button" style="display: none;">Enviar</button>
+    </div>
+
+    <script>
+        const socket = io('http://192.168.0.189:5000');
+
+        $(document).ready(function() {
+            $('#join_button').click(function() {
+                const username = $('#username_input').val();
+                if (username) {
+                    socket.emit('join', { username: username });
+                    $('#username_input').hide();
+                    $('#join_button').hide();
+                    $('#message_input').show();
+                    $('#send_button').show();
+                }
+            });
+
+            $('#send_button').click(function() {
+                sendMessage();
+            });
+
+            $('#message_input').keypress(function(event) {
+                if (event.which === 13) {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            function sendMessage() {
+                const message = $('#message_input').val();
+                if (message) {
+                    socket.emit('encrypt_message', { message: message, username: $('#username_input').val() });
+                    $('#message_input').val('');
+                }
+            }
+
+            socket.on('receive_encrypted_message', function(data) {
+                const encryptedMessage = data.message;
+                socket.emit('send_message', { message: encryptedMessage });
+            });
+
+            socket.on('receive_message', function(data) {
+                $('#messages').append('<div><strong>' + data.username + ':</strong> ' + data.message + '</div>');
+                $('#messages').scrollTop($('#messages')[0].scrollHeight);
+            });
+        });
+    </script>
+</body>
+</html>
